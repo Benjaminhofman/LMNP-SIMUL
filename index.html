@@ -12,7 +12,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulateur LMNP / LMP — régimes fiscal, social et TVA</title>
+<title>Simulateur LMNP — régimes fiscal, social et TVA</title>
 <style>
   :root{
     --navy:#14213d; --navy2:#1f2f52; --gold:#b7892f;
@@ -126,7 +126,7 @@
 <header>
   <div class="wrap">
     <div>
-      <h1>Simulateur LMNP / LMP</h1>
+      <h1>Simulateur LMNP</h1>
       <p>Orientation des régimes fiscal, social et TVA de la location meublée — à jour 2026</p>
     </div>
     <div class="expert-switch" id="expertToggle" role="switch" aria-checked="false" tabindex="0">
@@ -166,13 +166,6 @@
         <label for="thJouissance" style="margin:0;font-weight:500;cursor:pointer;">Je me réserve la <b>jouissance du bien</b> une partie de l'année (logement non loué en permanence)</label>
       </div>
     </div>
-    <div class="field" id="residWrap">
-      <div class="chk">
-        <input type="checkbox" id="residService">
-        <label for="residService" style="margin:0;font-weight:500;cursor:pointer;">Bien loué par bail à l'<b>exploitant d'une résidence de services</b> (EHPAD, résidence étudiante/senior)</label>
-      </div>
-    </div>
-
     <div class="sep"></div>
 
     <div class="field">
@@ -273,7 +266,7 @@
     <div id="notes"></div>
 
     <div class="disclaimer">
-      <strong>Avertissement.</strong> Cet outil fournit une <strong>orientation</strong> et un <strong>ordre de grandeur</strong>, à jour de la législation applicable en 2026 (loi de finances 2025, loi « Le Meur », LFSS 2026 — PS patrimoine porté à 18,6 %, art. 50-0, 155 IV, 261 D, 150 VB III du CGI ; art. L.611-1 du CSS). Il ne constitue ni un conseil fiscal, ni une liasse : les cotisations sociales, la CFE, la TVA et l'imposition réelle dépendent de paramètres individuels non tous modélisés. Toute décision doit être validée par un professionnel au vu du dossier complet.
+      <strong>Avertissement.</strong> Cet outil fournit une orientation et un ordre de grandeur à partir de la législation applicable en juillet 2026. Le résultat annuel d'une activité LMNP non professionnelle supporte des prélèvements sociaux de 18,6 %, tandis que les plus-values immobilières demeurent soumises au taux de 17,2 %. Les résultats réels dépendent notamment de la situation du foyer, de la nature exacte des charges, de la ventilation terrain-construction-mobilier, du plan d'amortissement par composants, de la CFE, de la TVA et d'une éventuelle affiliation sociale. Toute décision doit être validée au regard du dossier complet.
     </div>
   </section>
 
@@ -422,25 +415,18 @@ function compute(){
   r.affilie = (social.label.indexOf('Affiliation') === 0) || (social.label.indexOf('Affiliation SSI')>=0);
 
   /* 3. TVA */
-  var residService = el('residService').checked && type === 'longue';
-  r.residService = residService;
   var tva = {};
-  var tvaOui = cat.tvaBase || para || residService;
+  var tvaOui = cat.tvaBase || para;
   if(tvaOui){
     tva.label = "Dans le champ de la TVA";
     tva.tone = "a";
-    tva.sub = residService
-      ? "Bail à l'exploitant d'une résidence de services : location soumise à la TVA. Option fréquente pour la TVA afin de récupérer la TVA (20 %) sur le prix d'acquisition ; franchise en base possible sinon."
-      : (type === 'hotes')
+    tva.sub = (type === 'hotes')
         ? "Chambres d'hôtes : en principe soumises à la TVA (para-hôtellerie), mais l'exploitant peut être dispensé de la facturer sous la franchise en base : CA ≤ 85 000 € (année précédente) ou 93 500 € (en cours)."
         : "Para-hôtellerie soumise à la TVA, mais dispense de facturation sous la franchise en base : CA ≤ 85 000 € (année précédente) / 93 500 € (en cours).";
-    tva.detail = residService
-      ? "Art. 261 D 4° CGI : les locations (nues ou meublées) consenties à l'exploitant d'un établissement d'hébergement dont l'activité est elle-même assujettie sont soumises à TVA. L'option (art. 293 F) permet de récupérer la TVA d'acquisition ; engagement de conservation à surveiller."
-      : (type === 'hotes')
+    tva.detail = (type === 'hotes')
         ? "Sous franchise : facturation sans TVA, mention « TVA non applicable, art. 293 B du CGI », sans récupération de la TVA sur achats/travaux. Au-delà des seuils ou sur option : TVA 10 % (hébergement et table d'hôtes), 20 % (boissons alcoolisées)."
         : "Hors exonération de l'art. 261 D 4° : activité para-hôtelière soumise à TVA (art. 261 D 4°-b CGI) ; franchise en base de l'art. 293 B (10 % hébergement, 20 % alcool au-delà des seuils).";
   } else {
-    r.residService = false;
     tva.label = "Exonéré de TVA";
     tva.tone = "g";
     tva.sub = "Location meublée d'habitation : exonération de plein droit, option impossible.";
@@ -629,11 +615,7 @@ function render(){
     + (f.deficit<0 ? '→ déficit reportable '+euro(f.deficit)+' (revenus LMNP, 10 ans, art. 156).' : '')
     + '</div>';
   // Alerte plus-value — distincte réel / micro
-  if(r.residService){
-    notes += '<div class="note ok">'
-      + '<b>Plus-value à la revente — résidence de services.</b> Les résidences de services (étudiants, seniors, EHPAD) sont '
-      + '<b>exclues</b> de la réintégration des amortissements (art. 150 VB III CGI) : la plus-value n\'est <b>pas minorée</b> des amortissements déduits, même au régime réel.</div>';
-  } else if(!r.qualif.lmp){
+  if(!r.qualif.lmp){
     notes += '<div class="note pv">'
       + '<b>Plus-value à la revente — au régime réel.</b> Depuis les cessions du 15 février 2025, les amortissements déduits '
       + '<b>minorent le prix d\'acquisition</b> (art. 150 VB III CGI) — sauf résidences services étudiants/seniors et EHPAD. '
@@ -643,7 +625,8 @@ function render(){
         + '<b>Plus-value à la revente — au micro-BIC.</b> Aucun amortissement n\'étant déduit au titre de l\'art. 39 C, '
         + 'la plus-value <b>n\'est pas minorée des amortissements</b> : la réintégration de l\'art. 150 VB III ne s\'applique pas au micro. '
         + 'Elle relève du droit commun des particuliers (prix majoré des forfaits 7,5 % / 15 %, abattements pour durée de détention). '
-        + '<i>Atout du micro à la revente, à mettre en balance avec l\'économie annuelle du réel</i> (confirmation BOFiP attendue).</div>';
+        + '<i>Atout du micro à la revente, à mettre en balance avec l\'économie annuelle du réel</i> (confirmation BOFiP attendue). '
+        + 'Lorsque le contribuable a antérieurement relevé du régime réel, les amortissements admis en déduction pendant cette période restent pris en compte lors de la cession, même si l\'activité relève du micro-BIC au moment de la vente.</div>';
     }
   }
   // Cotisation minimale + détail SSI
@@ -706,13 +689,23 @@ function render(){
       + 'TVA para-hôtelière : 10 % hébergement et table d\'hôtes, 20 % boissons alcoolisées, franchise en base sous les seuils.'
       + '</div>';
   }
-  // Rappel — autres cas d'assujettissement à la TVA (art. 261 D 4°)
+  // Rappel — assujettissement à la TVA (art. 261 D CGI)
   notes += '<div class="note info expert-only">'
-    + '<b>Autres cas d\'assujettissement à la TVA en LMNP (art. 261 D 4° CGI).</b> Outre la para-hôtellerie&nbsp;: '
-    + '① hôtels de tourisme classés et villages de vacances classés ou agréés&nbsp;; '
-    + '② résidences de tourisme classées (bail ≥ 9 ans à un ou plusieurs exploitants avec engagement de promotion touristique à l\'étranger)&nbsp;; '
-    + '③ locations (nues ou meublées) consenties à l\'exploitant d\'un établissement d\'hébergement — EHPAD, résidences étudiantes/seniors — dont l\'activité est elle-même assujettie. '
-    + 'Dans ces cas, l\'investisseur est dans le champ de la TVA&nbsp;: franchise en base sous 85 000&nbsp;€&nbsp;/&nbsp;93 500&nbsp;€ (art. 293 B), ou <b>option pour la TVA</b> (art. 293 F) afin de récupérer la TVA d\'acquisition. L\'option prend effet le 1<sup>er</sup> jour du mois où elle est déclarée par écrit.'
+    + '<b>Assujettissement à la TVA en LMNP (art. 261 D CGI).</b> '
+    + 'La liste relative aux hôtels classés, villages de vacances et résidences de tourisme avec bail de neuf ans correspond à une ancienne présentation du dispositif. Depuis la réforme de l\'article 261 D, le classement touristique ou la durée de neuf ans du bail ne constitue plus, à lui seul, un cas autonome d\'assujettissement. '
+    + 'Sont notamment taxées de plein droit&nbsp;: '
+    + '<ul>'
+    + '<li>les prestations hôtelières ou para-hôtelières proposant des séjours pouvant ne pas dépasser trente nuitées et au moins trois services sur quatre&nbsp;;</li>'
+    + '<li>les locations meublées résidentielles assorties d\'au moins trois services sur quatre&nbsp;;</li>'
+    + '<li>les locations consenties à un exploitant qui réalise lui-même l\'une de ces activités taxables.</li>'
+    + '</ul>'
+    + 'Les hôtels, chambres d\'hôtes, résidences de tourisme ou résidences services sont des exemples de structures susceptibles de répondre à ces critères, mais leur seule dénomination ou leur classement ne suffit pas. '
+    + 'Les seuils de franchise en base sont bien de&nbsp;: '
+    + '<ul>'
+    + '<li>85 000&nbsp;€ au titre de l\'année civile précédente&nbsp;;</li>'
+    + '<li>93 500&nbsp;€ en cours d\'année, avec perte de la franchise dès la date du dépassement.</li>'
+    + '</ul>'
+    + 'L\'option prévue à l\'article 293 F prend bien effet le premier jour du mois au cours duquel elle est déclarée et couvre une période de deux ans. Elle permet seulement de renoncer à la franchise pour des opérations déjà imposables&nbsp;: elle ne permet pas de soumettre volontairement à la TVA une location meublée ordinaire exonérée par l\'article 261 D.'
     + '</div>';
   el('notes').innerHTML = notes;
 }
@@ -728,9 +721,6 @@ function syncPara(){
   var hideTh = (t === 'longue');
   el('thWrap').style.display = hideTh ? 'none' : 'block';
   if(hideTh) el('thJouissance').checked = false;
-  // Résidence de services (bail à exploitant) : proposé en longue durée seulement
-  el('residWrap').style.display = (t === 'longue') ? 'block' : 'none';
-  if(t !== 'longue') el('residService').checked = false;
 }
 document.querySelectorAll('input[name=type]').forEach(function(rb){
   rb.addEventListener('change', function(){
@@ -740,7 +730,7 @@ document.querySelectorAll('input[name=type]').forEach(function(rb){
     render();
   });
 });
-['recettes','autres','chargesImmo','chargesActivite','valTotal','terrainPct','go_pct','go_dur','fa_pct','fa_dur','ig_pct','ig_dur','ag_pct','ag_dur','mob_val','mob_dur','stockDiff','tmi','rfr','parts','para','tauxSSI','thJouissance','residService'].forEach(function(id){
+['recettes','autres','chargesImmo','chargesActivite','valTotal','terrainPct','go_pct','go_dur','fa_pct','fa_dur','ig_pct','ig_dur','ag_pct','ag_dur','mob_val','mob_dur','stockDiff','tmi','rfr','parts','para','tauxSSI','thJouissance'].forEach(function(id){
   el(id).addEventListener('input', render);
   el(id).addEventListener('change', render);
 });
