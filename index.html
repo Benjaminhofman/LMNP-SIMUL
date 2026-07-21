@@ -617,9 +617,10 @@ function render(){
   // Alerte plus-value — distincte réel / micro
   if(!r.qualif.lmp){
     notes += '<div class="note pv">'
-      + '<b>Plus-value à la revente — au régime réel.</b> Depuis les cessions du 15 février 2025, les amortissements déduits '
-      + '<b>minorent le prix d\'acquisition</b> (art. 150 VB III CGI) — sauf résidences services étudiants/seniors et EHPAD. '
-      + 'La plus-value (19 % IR + 17,2 % PS) s\'en trouve alourdie.</div>';
+      + '<b>Plus-value à la revente au régime réel.</b> Pour les cessions réalisées depuis le 15 février 2025, le prix d\'acquisition est minoré des amortissements effectivement admis en déduction en application de l\'article 39 C du CGI. '
+      + 'Les amortissements comptabilisés mais demeurés en report ne sont pas concernés tant qu\'ils n\'ont pas été déduits. '
+      + 'Certaines résidences étudiantes, résidences services pour personnes âgées ou handicapées et certains établissements médico-sociaux ou de soins de longue durée sont exclus du dispositif. '
+      + 'La plus-value immobilière demeure soumise à l\'IR au taux de 19 % et aux prélèvements sociaux de 17,2 %, après application des abattements pour durée de détention.</div>';
     if(f.microPossible){
       notes += '<div class="note ok">'
         + '<b>Plus-value à la revente — au micro-BIC.</b> Aucun amortissement n\'étant déduit au titre de l\'art. 39 C, '
